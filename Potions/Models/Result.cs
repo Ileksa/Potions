@@ -9,6 +9,7 @@ namespace Potions
 	public class Result
 	{
 		public bool IsSuccess { get; }
+		public bool IsFailed => !IsSuccess;
 		public string ErrorMessage { get; }
 
 		protected Result()

@@ -2,7 +2,8 @@
 {
 	public enum Duration
 	{
-		FiveMinutes = 0,
+		Undefined = 0,
+		FiveMinutes,
 		Hour,
 		FiveHours,
 		Week,

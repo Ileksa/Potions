@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Functional.Maybe;
+using System.Collections.Generic;
 
 namespace Potions
 {
@@ -8,7 +9,7 @@ namespace Potions
 		public string Name { get; set; }
 		public Effect Effect { get; set; }
 		public Duration Duration { get; set; }
-		public int Price { get; set; }
+		public Maybe<int> Price { get; set; }
 
 		public IReadOnlyCollection<Item> Recipe { get; set; }
 
@@ -18,6 +19,7 @@ namespace Potions
 			Name = "Undefined";
 			Effect = Effect.Empty;
 			Recipe = new List<Item>();
+			Price = Maybe<int>.Nothing;
 		}
 	}
 }
