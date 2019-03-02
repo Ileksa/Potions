@@ -20,7 +20,7 @@ namespace Potions.Applications
 			_itemPool = new ItemPool();
 			_potionValidator = new PotionValidator();
 			_potionParser = new PotionParser(_itemPool, _potionValidator);
-			_potionPrinter = new ConsolePotionPrinter();
+			_potionPrinter = new BBCodePotionPrinter("result.txt");
 		}
 
 		public void Run()
@@ -41,18 +41,21 @@ namespace Potions.Applications
 				using (var sr = new StreamReader(path))
 				{
 					var results = _potionParser.ParsePotions(sr);
-					foreach (var result in results)
+					var successPotions = results
+						.Where(r => r.Item2.IsSuccess)
+						.Select(r => r.Item1)
+						.ToArray();
+					var errors = results
+						.Where(r => r.Item2.IsFailed)
+						.Select(r => r.Item2)
+						.ToArray();
+
+					_potionPrinter.Print(successPotions);
+
+					foreach (var error in errors)
 					{
-						if (result.Item2.IsSuccess)
-						{
-							Console.WriteLine("Успех!");
-							_potionPrinter.Print(result.Item1);
-						}
-						else
-						{
-							Console.WriteLine("Не удалось распознать зелье");
-							Console.WriteLine(result.Item2.ErrorMessage);
-						}
+						Console.WriteLine("Не удалось распознать зелье");
+						Console.WriteLine(error.ErrorMessage);
 					}
 				}
 			}
