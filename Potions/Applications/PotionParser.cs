@@ -107,7 +107,31 @@ namespace Potions
 
 		private Result SetDuration(Potion potion, string line)
 		{
-			throw new NotImplementedException();
+			switch (line.ToLower())
+			{
+				case string s when s.Contains("пять минут"):
+					potion.Duration = Duration.FiveMinutes;
+					break;
+				case string s when s.Contains("час"):
+					potion.Duration = Duration.Hour;
+					break;
+				case string s when s.Contains("пять часов"):
+					potion.Duration = Duration.FiveHours;
+					break;
+				case string s when s.Contains("неделя"):
+					potion.Duration = Duration.Week;
+					break;
+				case string s when s.Contains("месяц"):
+					potion.Duration = Duration.Month;
+					break;
+				case string s when s.Contains("два месяца"):
+					potion.Duration = Duration.TwoMonths;
+					break;
+				default:
+					return Result.Failed($"Не удалось распознать длительность в строке {line}");
+			}
+
+			return Result.Success;
 		}
 
 		private Result SetRecipe(Potion potion, string line)

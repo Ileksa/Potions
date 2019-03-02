@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\Duration.cs" />
     <Compile Include="Applications\PotionParser.cs" />
     <Compile Include="Models\Effect.cs" />
     <Compile Include="Models\Result.cs" />
@@ -74,7 +75,7 @@
     <Compile Include="Services\ItemPool.cs" />
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\Potion.cs" />
-    <Compile Include="Models\Rarity.cs" />
+    <Compile Include="Enums\Rarity.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

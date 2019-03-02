@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Potions
 {
@@ -8,7 +7,7 @@ namespace Potions
 		public int Level { get; set; }
 		public string Name { get; set; }
 		public Effect Effect { get; set; }
-		public TimeSpan Duration { get; set; }
+		public Duration Duration { get; set; }
 		public int Price { get; set; }
 
 		public IReadOnlyCollection<Item> Recipe { get; set; }
