@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Potions.Applications;
 
 namespace Potions
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            return;
-        }
-    }
+	class Program
+	{
+		static void Main(string[] args)
+		{
+			new ConsoleApplication().Run();
+		}
+	}
 }

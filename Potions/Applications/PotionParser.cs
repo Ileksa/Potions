@@ -10,13 +10,27 @@ namespace Potions
 	public class PotionParser
 	{
 		private readonly IItemPool _itemPool;
+		private readonly IPotionValidator _potionValidator;
 
-		public PotionParser(IItemPool itemPool)
+		public PotionParser(IItemPool itemPool, IPotionValidator potionValidator)
 		{
 			_itemPool = itemPool;
+			_potionValidator = potionValidator;
 		}
 		private readonly char[] _separators = new char[] { '+', '>', '→', '?' };
 		private readonly string _intPattern = "\\d+";
+
+		public IReadOnlyCollection<Tuple<Potion, Result>> ParsePotions(StreamReader sr)
+		{
+			var results = new List<Tuple<Potion, Result>>();
+			while (!sr.EndOfStream)
+			{
+				var res = ParsePotion(sr, out Potion potion);
+				results.Add(new Tuple<Potion, Result>(potion, res));
+			}
+			return results;
+		}
+
 		/// <summary>
 		/// Распознает зелье и записывает его в result.
 		/// </summary>
@@ -25,14 +39,14 @@ namespace Potions
 			potion = new Potion();
 			var result = Result.Success;
 
-			while (true)
+			while (!sr.EndOfStream)
 			{
 				var line = sr.ReadLine();
 				Result res = null;
 
 				switch (line)
 				{
-					case string s when s == Environment.NewLine:
+					case string s when s == String.Empty:
 						return result;
 					case string s when s.StartsWith("+"):
 						res = SetEffect(potion, line);
@@ -53,7 +67,9 @@ namespace Potions
 
 				result = Result.Combine(result, res);
 			}
+			return _potionValidator.Check(potion);
 		}
+
 
 		/// <summary>
 		/// Разбирает переданную строку на элементы рецепта. В случае успеха возвращает true и записывает рецепт в переменную result. Иначе возвращает false и текст ошибки.
@@ -150,7 +166,10 @@ namespace Potions
 				return result;
 			}
 
-			var level = items.Select(i => i.Level).Max();
+			var level = items
+				.Where(i => !i.IsAction)
+				.Select(i => i.Level)
+				.Max();
 
 			potion.Recipe = items;
 			potion.Level = level;
