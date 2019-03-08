@@ -19,6 +19,7 @@ namespace Potions
 		}
 		private readonly char[] _separators = new char[] { '+', '>', '→', '?' };
 		private readonly string _intPattern = "\\d+";
+		private readonly string _numberListPattern = "^\\d+\\)";
 
 		public IReadOnlyCollection<Tuple<Potion, Result>> ParsePotions(StreamReader sr)
 		{
@@ -54,8 +55,8 @@ namespace Potions
 					case string s when s.StartsWith("Длительность"):
 						res = SetDuration(potion, line);
 						break;
-					case string s when s.StartsWith("Рецепт"):
-						res = SetRecipeAndLevel(potion, line);
+					case string s when (s.StartsWith("Рецепт")|| IsRecipe(s)):
+						res = AddRecipe(potion, line);
 						break;
 					case string s when s.StartsWith("Ценность"):
 						res = SetPrice(potion, line);
@@ -67,17 +68,27 @@ namespace Potions
 
 				result = Result.Combine(result, res);
 			}
-			return _potionValidator.Check(potion);
+			SetLevel(potion);
+			return result.IsSuccess ? _potionValidator.Check(potion) : result;
 		}
 
+		private bool IsRecipe(string line)
+		{
+			if (line.Length > 0 && Char.IsDigit(line[0]))
+			{
+				var match = Regex.Match(line, _numberListPattern);
+				return match.Success;
+			}
+			return false;
+		}
 
 		/// <summary>
 		/// Разбирает переданную строку на элементы рецепта. В случае успеха возвращает true и записывает рецепт в переменную result. Иначе возвращает false и текст ошибки.
 		/// </summary>
-		public Result ParseRecipe(string recipe, out List<Item> result)
+		public Result ParseRecipe(string recipe, out Recipe result)
 		{
 			var itemsNames = recipe.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
-			result = new List<Item>();
+			var items = new List<Item>();
 
 			foreach (var itemName in itemsNames)
 			{
@@ -85,10 +96,12 @@ namespace Potions
 				var item = _itemPool.Find(clearedItemName);
 				if (!item.HasValue)
 				{
+					result = null;
 					return Result.Failed($"Не удалось распознать ингредиент с названием {itemName}");
 				}
-				result.Add(item.Value);
+				items.Add(item.Value);
 			}
+			result = new Recipe(items);
 			return Result.Success;
 		}
 
@@ -152,27 +165,41 @@ namespace Potions
 			return Result.Success;
 		}
 
-		private Result SetRecipeAndLevel(Potion potion, string line)
+		private void SetLevel(Potion potion)
 		{
-			var recipe = line
+			potion.Level = potion
+				.Recipes
+				.Select(r => r.Items
+					.Where(i => !i.IsAction)
+					.Select(i => i.Level)
+					.Max())
+				.Max();
+		}
+
+		private Result AddRecipe(Potion potion, string line)
+		{
+			var recipeText = line
 				.Replace("Рецепт:", String.Empty)
-				.Replace("Рецепт", String.Empty)
-				.Trim(' ');
+				.Replace("Рецепт", String.Empty);
 
+			var match = Regex.Match(line, _numberListPattern);
+			if (match.Success)
+			{
+				recipeText = recipeText.Substring(match.Length);
+			}
 
-			var result = ParseRecipe(recipe, out List<Item> items);
+			recipeText = recipeText.Trim(' ');
+
+			var result = ParseRecipe(recipeText, out Recipe recipe);
 			if (result.IsFailed)
 			{
 				return result;
 			}
 
-			var level = items
-				.Where(i => !i.IsAction)
-				.Select(i => i.Level)
-				.Max();
-
-			potion.Recipe = items;
-			potion.Level = level;
+			if (recipe.Items.Count > 0)
+			{
+				potion.Add(recipe);
+			}
 
 			return Result.Success;
 		}

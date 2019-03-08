@@ -12,7 +12,7 @@ namespace Potions
 		{
 			Console.WriteLine(potion.Name);
 			Console.WriteLine("Уровень: " + potion.Level);
-			Console.WriteLine("Количество ингредиентов: " + potion.Recipe.Count);
+			Console.WriteLine("Количество рецептов: " + potion.Recipes.Count);
 		}
 
 		public void Print(IReadOnlyCollection<Potion> potions)

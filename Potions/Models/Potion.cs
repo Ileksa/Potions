@@ -11,15 +11,21 @@ namespace Potions
 		public Duration Duration { get; set; }
 		public Maybe<int> Price { get; set; }
 
-		public IReadOnlyCollection<Item> Recipe { get; set; }
+		private List<Recipe> _recipes;
+		public IReadOnlyCollection<Recipe> Recipes { get { return _recipes; } }
 
 		public Potion()
 		{
 			Level = 1;
 			Name = "Undefined";
 			Effect = Effect.Empty;
-			Recipe = new List<Item>();
+			_recipes = new List<Recipe>();
 			Price = Maybe<int>.Nothing;
+		}
+
+		public void Add(Recipe recipe)
+		{
+			_recipes.Add(recipe);
 		}
 	}
 }

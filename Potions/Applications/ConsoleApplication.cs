@@ -56,6 +56,7 @@ namespace Potions.Applications
 					{
 						Console.WriteLine("Не удалось распознать зелье");
 						Console.WriteLine(error.ErrorMessage);
+						Console.WriteLine();
 					}
 				}
 			}

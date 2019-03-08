@@ -1,4 +1,5 @@
 ﻿using Functional.Maybe;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -109,7 +110,7 @@ namespace Potions
 			PrintName(sw, potion.Name);
 			Print(sw, potion.Effect);
 			Print(sw, potion.Duration);
-			Print(sw, potion.Recipe);
+			Print(sw, potion.Recipes);
 			PrintPrice(sw, potion.Price);
 		}
 
@@ -170,11 +171,26 @@ namespace Potions
 			sw.WriteLine(name.Bold());
 		}
 
-		private void Print(StreamWriter sw, IReadOnlyCollection<Item> recipe)
+		private void Print(StreamWriter sw, IReadOnlyCollection<Recipe> recipes)
 		{
-			sw.WriteLine("Рецепт".Bold()
-				+ ": "
-				+ String.Join(" + ", recipe.Select(i => i.Name)));
+			switch (recipes.Count)
+			{
+				case 0:
+					break;
+				case 1:
+					sw.WriteLine("Рецепт".Bold()
+						+ ": "
+						+ String.Join(" + ", recipes.First().Items.Select(i => i.Name)));
+					break;
+				default:
+					sw.WriteLine("Рецепты:".Bold());
+					recipes.ForEach((r, index) =>
+					{
+						sw.WriteLine($"{index + 1}) "
+							+ String.Join(" + ", r.Items.Select(i => i.Name)));
+					});
+					break;
+			}
 		}
 
 		private void PrintPrice(StreamWriter sw, Maybe<int> price)
