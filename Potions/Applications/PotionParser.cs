@@ -17,7 +17,7 @@ namespace Potions
 			_itemPool = itemPool;
 			_potionValidator = potionValidator;
 		}
-		private readonly char[] _separators = new char[] { '+', '>', '→', '?' };
+		private readonly char[] _separators = new char[] { '+', '>', '→', '?', '-' };
 		private readonly string _intPattern = "\\d+";
 		private readonly string _numberListPattern = "^\\d+\\)";
 		private readonly string _multiplyItem = "(x|х)\\d+";
@@ -107,6 +107,7 @@ namespace Potions
 				}
 
 				clearedItemName = clearedItemName.Trim();
+				clearedItemName = CorrectItemNameIfPossible(clearedItemName);
 				var item = _itemPool.Find(clearedItemName);
 				if (!item.HasValue)
 				{
@@ -200,6 +201,11 @@ namespace Potions
 
 		private Result AddRecipe(Potion potion, string line)
 		{
+			if (line.StartsWith("Рецепты"))
+			{
+				return Result.Success;
+			}
+
 			var recipeText = line
 				.Replace("Рецепт:", String.Empty)
 				.Replace("Рецепт", String.Empty);
@@ -247,6 +253,28 @@ namespace Potions
 		{
 			potion.Name = line;
 			return Result.Success;
+		}
+
+		//ключ - неверное название, значение - верное название
+		private Dictionary<string, string> correctItemNames = new Dictionary<string, string>()
+		{ //сортировать по алфавиту по ключу
+			{"вербена", "соцветия вербены" },
+			{"воронец", "воронец колосистый" },
+			{"гусеницы", "сушеные гусеницы" },
+			{"лаванда", "цветок лаванды"},
+			{"можжевельник", "плоды можжевельника" },
+			{"папоротник", "соцветия папоротника" },
+			{"помешивание", "простое помешивание" },
+			{"простое простое заклинание", "простое заклинание" },
+			{"соцветие папоротника", "соцветия папоротника" },
+		};
+
+		private string CorrectItemNameIfPossible(string itemName)
+		{
+			var lower = itemName.ToLower();
+			return correctItemNames.ContainsKey(lower)
+				? correctItemNames[lower]
+				: itemName;
 		}
 	}
 }

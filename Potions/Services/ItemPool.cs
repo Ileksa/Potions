@@ -42,7 +42,7 @@ namespace Potions
 		}
 
 
-		private readonly Item _fullMoon = new Item(2, "Полнолуние", true);
+		private readonly Item _fullMoon = new Item(2, "Свет полной луны", true);
 		private readonly List<Item> _actions = new List<Item>()
 		{
 			new Item(1, "Простое помешивание", true),
