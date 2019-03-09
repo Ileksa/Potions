@@ -20,6 +20,7 @@ namespace Potions
 		private readonly char[] _separators = new char[] { '+', '>', '→', '?' };
 		private readonly string _intPattern = "\\d+";
 		private readonly string _numberListPattern = "^\\d+\\)";
+		private readonly string _multiplyItem = "(x|х)\\d+";
 
 		public IReadOnlyCollection<Tuple<Potion, Result>> ParsePotions(StreamReader sr)
 		{
@@ -83,23 +84,39 @@ namespace Potions
 		}
 
 		/// <summary>
-		/// Разбирает переданную строку на элементы рецепта. В случае успеха возвращает true и записывает рецепт в переменную result. Иначе возвращает false и текст ошибки.
+		/// Разбирает переданную строку на элементы рецепта.
 		/// </summary>
 		public Result ParseRecipe(string recipe, out Recipe result)
 		{
+			result = null;
 			var itemsNames = recipe.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 			var items = new List<Item>();
 
 			foreach (var itemName in itemsNames)
 			{
-				var clearedItemName = itemName.Trim();
+				var clearedItemName = itemName;
+				int count = 1;
+				var match = Regex.Match(itemName, _multiplyItem);
+				if (match.Success)
+				{
+					if (!Int32.TryParse(match.Value.Substring(1), out count))
+					{
+						return Result.Failed($"Не удалось получить целое число из совпадения {match.Value} вида (x|х)\\d+ из строки {itemName}");
+					}
+					clearedItemName = itemName.Substring(0, match.Index);
+				}
+
+				clearedItemName = clearedItemName.Trim();
 				var item = _itemPool.Find(clearedItemName);
 				if (!item.HasValue)
 				{
-					result = null;
 					return Result.Failed($"Не удалось распознать ингредиент с названием {itemName}");
 				}
-				items.Add(item.Value);
+
+				for (int i = 0; i < count; i++)
+				{
+					items.Add(item.Value);
+				}
 			}
 			result = new Recipe(items);
 			return Result.Success;
@@ -167,6 +184,11 @@ namespace Potions
 
 		private void SetLevel(Potion potion)
 		{
+			if (potion.Recipes.Count == 0)
+			{
+				return;
+			}
+
 			potion.Level = potion
 				.Recipes
 				.Select(r => r.Items
