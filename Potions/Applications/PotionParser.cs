@@ -40,8 +40,8 @@ namespace Potions
 		{
 			potion = new Potion();
 			var result = Result.Success;
-
-			while (!sr.EndOfStream)
+			var endOfPotion = false;
+			while (!sr.EndOfStream && !endOfPotion)
 			{
 				var line = sr.ReadLine();
 				Result res = null;
@@ -49,7 +49,9 @@ namespace Potions
 				switch (line)
 				{
 					case string s when s == String.Empty:
-						return result;
+						endOfPotion = true;
+						res = Result.Success;
+						break;
 					case string s when s.StartsWith("+"):
 						res = SetEffect(potion, line);
 						break;
