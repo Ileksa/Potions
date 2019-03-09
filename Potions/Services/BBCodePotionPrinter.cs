@@ -34,6 +34,35 @@ namespace Potions
 			}
 		}
 
+		private Potion CombinePotions(IEnumerable<Potion> potions)
+		{
+			var first = potions.First();
+			var result = new Potion()
+			{
+				Level = first.Level,
+				Name = first.Name,
+				Effect = first.Effect,
+				Duration = first.Duration,
+				Price = potions.Select(p => p.Price).FirstMaybe(p => p.HasValue)
+			};
+
+			foreach (var p in potions)
+			{
+				result.AddRange(p.Recipes);
+			}
+
+			return result;
+	}
+
+		//фильтрует, коллапсирует и сортирует зелья
+		private IReadOnlyCollection<Potion> OrganizePotions(Potion[] potions, Func<Potion, bool> filterPredicate)
+		{
+			var filtered = potions.Where(filterPredicate);
+			var groupped = filtered.GroupBy(p => p.Name, (key, ps) => CombinePotions(ps));
+			var ordered = groupped.OrderBy(p => p.Price.HasValue ? p.Price.Value : 0);
+			return ordered.ToArray();
+		}
+
 		private void PrintByLevel(StreamWriter sw, IReadOnlyCollection<Potion> potions, int level)
 		{
 			var potionsByLevel = potions.Where(p => p.Level == level).ToArray();
@@ -42,28 +71,28 @@ namespace Potions
 				return;
 			}
 
-			var concentrationPotions = potionsByLevel.Where(p => p.Effect.Concentration > 0 && p.Effect.Stability == 0 && p.Effect.Efficiency == 0).ToArray();
-			var stabilityPotions = potionsByLevel.Where(p => p.Effect.Concentration == 0 && p.Effect.Stability > 0 && p.Effect.Efficiency == 0).ToArray();
-			var efficiencyPotions = potionsByLevel.Where(p => p.Effect.Concentration == 0 && p.Effect.Stability == 0 && p.Effect.Efficiency > 0).ToArray();
-			var oldStylePotions = potionsByLevel.Where(p => p.Effect.Concentration > 0 && p.Effect.Stability > 0 && p.Effect.Efficiency > 0).ToArray();
+			var concentrationPotions = OrganizePotions(potionsByLevel, p => p.Effect.Concentration > 0 && p.Effect.Stability == 0 && p.Effect.Efficiency == 0);
+			var stabilityPotions = OrganizePotions(potionsByLevel, p => p.Effect.Concentration == 0 && p.Effect.Stability > 0 && p.Effect.Efficiency == 0);
+			var efficiencyPotions = OrganizePotions(potionsByLevel, p => p.Effect.Concentration == 0 && p.Effect.Stability == 0 && p.Effect.Efficiency > 0);
+			var oldStylePotions = OrganizePotions(potionsByLevel, p => p.Effect.Concentration > 0 && p.Effect.Stability > 0 && p.Effect.Efficiency > 0);
 
 			PrintLevelHeader(sw, $"Рецепты зелий {level} уровня");
-			if (concentrationPotions.Length > 0)
+			if (concentrationPotions.Count > 0)
 			{
 				PrintEffectHeader(sw, "Концентрация");
 				PrintTimeGroups(sw, concentrationPotions);
 			}
-			if (stabilityPotions.Length > 0)
+			if (stabilityPotions.Count > 0)
 			{
 				PrintEffectHeader(sw, "Устойчивость");
 				PrintTimeGroups(sw, stabilityPotions);
 			}
-			if (efficiencyPotions.Length > 0)
+			if (efficiencyPotions.Count > 0)
 			{
 				PrintEffectHeader(sw, "Эффективность");
 				PrintTimeGroups(sw, efficiencyPotions);
 			}
-			if (oldStylePotions.Length > 0)
+			if (oldStylePotions.Count > 0)
 			{
 				PrintEffectHeader(sw, "Старого образца");
 				PrintTimeGroups(sw, oldStylePotions);
@@ -112,6 +141,7 @@ namespace Potions
 			Print(sw, potion.Duration);
 			Print(sw, potion.Recipes);
 			PrintPrice(sw, potion.Price);
+			sw.WriteLine();
 		}
 
 		private void Print(StreamWriter sw, Effect effect)
@@ -171,6 +201,13 @@ namespace Potions
 			sw.WriteLine(name.Bold());
 		}
 
+		private IReadOnlyCollection<Recipe> Sort(IReadOnlyCollection<Recipe> recipes)
+		{
+			var result = new List<Recipe>(recipes);
+			result.Sort();
+			return result;
+		}
+
 		private void Print(StreamWriter sw, IReadOnlyCollection<Recipe> recipes)
 		{
 			switch (recipes.Count)
@@ -183,8 +220,9 @@ namespace Potions
 						+ String.Join(" + ", recipes.First().Items.Select(i => i.Name)));
 					break;
 				default:
+					var sorted = Sort(recipes);
 					sw.WriteLine("Рецепты:".Bold());
-					recipes.ForEach((r, index) =>
+					sorted.ForEach((r, index) =>
 					{
 						sw.WriteLine($"{index + 1}) "
 							+ String.Join(" + ", r.Items.Select(i => i.Name)));

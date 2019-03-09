@@ -27,5 +27,10 @@ namespace Potions
 		{
 			_recipes.Add(recipe);
 		}
+
+		public void AddRange(IReadOnlyCollection<Recipe> recipes)
+		{
+			_recipes.AddRange(recipes);
+		}
 	}
 }

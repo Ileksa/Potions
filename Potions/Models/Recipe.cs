@@ -1,16 +1,39 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Potions
 {
 	/// <summary>
 	/// Рецепт зелья.
 	/// </summary>
-	public class Recipe
+	public class Recipe : IComparable<Recipe>
 	{
-		public IReadOnlyCollection<Item> Items { get; }
+		private List<Item> _items;
+		public IReadOnlyCollection<Item> Items { get { return _items; } }
 		public Recipe(IReadOnlyCollection<Item> items)
 		{
-			Items = items;
+			_items = items.ToList();
+		}
+
+		public int CompareTo(Recipe other)
+		{
+			var min = Math.Min(_items.Count, other._items.Count);
+			for (int i = 0; i < min; i++)
+			{
+				var stringComparison = String.Compare(_items[i].Name, other._items[i].Name);
+				if (stringComparison != 0)
+				{
+					return stringComparison;
+				}
+			}
+
+			if (_items.Count == other._items.Count)
+			{
+				return 0;
+			}
+
+			return (_items.Count < other._items.Count) ? -1 : 1;
 		}
 	}
 }
