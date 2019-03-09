@@ -18,6 +18,7 @@ namespace Potions
 			_potionValidator = potionValidator;
 		}
 		private readonly char[] _separators = new char[] { '+', '>', '→', '?', '-' };
+		private readonly char[] _trimSeparators = new char[] { ' ', ':', '.'};
 		private readonly string _intPattern = "\\d+";
 		private readonly string _numberListPattern = "^\\d+\\)";
 		private readonly string _multiplyItem = "(x|х)\\d+";
@@ -58,10 +59,10 @@ namespace Potions
 					case string s when s.StartsWith("Длительность"):
 						res = SetDuration(potion, line);
 						break;
-					case string s when (s.StartsWith("Рецепт")|| IsRecipe(s)):
+					case string s when (IsRecipe(s)):
 						res = AddRecipe(potion, line);
 						break;
-					case string s when s.StartsWith("Ценность"):
+					case string s when s.StartsWith("Ценность") || s.StartsWith("Цена"):
 						res = SetPrice(potion, line);
 						break;
 					default:
@@ -77,6 +78,16 @@ namespace Potions
 
 		private bool IsRecipe(string line)
 		{
+			if (line.StartsWith("Рецепт"))
+			{
+				return true;
+			}
+
+			if (line.StartsWith("="))
+			{
+				return true;
+			}
+
 			if (line.Length > 0 && Char.IsDigit(line[0]))
 			{
 				var match = Regex.Match(line, _numberListPattern);
@@ -108,12 +119,12 @@ namespace Potions
 					clearedItemName = itemName.Substring(0, match.Index);
 				}
 
-				clearedItemName = clearedItemName.Trim();
+				clearedItemName = clearedItemName.Trim(_trimSeparators);
 				clearedItemName = CorrectItemNameIfPossible(clearedItemName);
 				var item = _itemPool.Find(clearedItemName);
 				if (!item.HasValue)
 				{
-					return Result.Failed($"Не удалось распознать ингредиент с названием {itemName}");
+					return Result.Failed($"Не удалось распознать ингредиент с названием \'{itemName}\'");
 				}
 
 				for (int i = 0; i < count; i++)
@@ -210,7 +221,8 @@ namespace Potions
 
 			var recipeText = line
 				.Replace("Рецепт:", String.Empty)
-				.Replace("Рецепт", String.Empty);
+				.Replace("Рецепт", String.Empty)
+				.Replace("=", String.Empty);
 
 			var match = Regex.Match(line, _numberListPattern);
 			if (match.Success)
@@ -218,7 +230,7 @@ namespace Potions
 				recipeText = recipeText.Substring(match.Length);
 			}
 
-			recipeText = recipeText.Trim(' ');
+			recipeText = recipeText.Trim(_trimSeparators);
 
 			var result = ParseRecipe(recipeText, out Recipe recipe);
 			if (result.IsFailed)
@@ -266,9 +278,13 @@ namespace Potions
 			{"лаванда", "цветок лаванды"},
 			{"можжевельник", "плоды можжевельника" },
 			{"папоротник", "соцветия папоротника" },
+			{"плоды можжевельник", "плоды можжевельника" },
 			{"помешивание", "простое помешивание" },
 			{"простое простое заклинание", "простое заклинание" },
+			{"соцветие вербены", "соцветия вербены" },
 			{"соцветие папоротника", "соцветия папоротника" },
+			{"соцветия папоротник", "соцветия папоротника" },
+			{"сушеные сушеные жуки", "сушеные жуки" }
 		};
 
 		private string CorrectItemNameIfPossible(string itemName)
