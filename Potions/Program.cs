@@ -6,7 +6,7 @@ namespace Potions
 	{
 		static void Main(string[] args)
 		{
-			new ConsoleApplication().Run();
+			new RecipesByLevelApplication().Run();
 		}
 	}
 }

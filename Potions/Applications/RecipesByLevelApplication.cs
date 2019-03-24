@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Potions.Applications
 {
-	public class ConsoleApplication
+	public class RecipesByLevelApplication
 	{
 		private readonly IItemPool _itemPool;
 		private readonly IPotionValidator _potionValidator;
 		private readonly PotionParser _potionParser;
 		private readonly IIPotionPrinter _potionPrinter;
 
-		public ConsoleApplication()
+		public RecipesByLevelApplication()
 		{
 			//впилить ninject и вообще по уму сделать
 			_itemPool = new ItemPool();

@@ -68,9 +68,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Applications\ConsoleApplication.cs" />
+    <Compile Include="Applications\RecipesByLevelApplication.cs" />
     <Compile Include="Enums\Duration.cs" />
-    <Compile Include="Applications\PotionParser.cs" />
+    <Compile Include="Services\PotionParser.cs" />
     <Compile Include="Models\Effect.cs" />
     <Compile Include="Models\Recipe.cs" />
     <Compile Include="Models\Result.cs" />
