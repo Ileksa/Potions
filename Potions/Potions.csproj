@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Applications\RecipesByLevelApplication.cs" />
     <Compile Include="Enums\Duration.cs" />
+    <Compile Include="Services\ChainsGenerator.cs" />
     <Compile Include="Services\PotionParser.cs" />
     <Compile Include="Models\Effect.cs" />
     <Compile Include="Models\Recipe.cs" />
