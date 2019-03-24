@@ -174,20 +174,20 @@ namespace Potions
 				case string s when s.Contains("пять минут"):
 					potion.Duration = Duration.FiveMinutes;
 					break;
-				case string s when s.Contains("час"):
-					potion.Duration = Duration.Hour;
-					break;
 				case string s when s.Contains("пять часов"):
 					potion.Duration = Duration.FiveHours;
+					break;
+				case string s when s.Contains("час"):
+					potion.Duration = Duration.Hour;
 					break;
 				case string s when s.Contains("неделя"):
 					potion.Duration = Duration.Week;
 					break;
-				case string s when s.Contains("месяц"):
-					potion.Duration = Duration.Month;
-					break;
 				case string s when s.Contains("два месяца"):
 					potion.Duration = Duration.TwoMonths;
+					break;
+				case string s when s.Contains("месяц"):
+					potion.Duration = Duration.Month;
 					break;
 				default:
 					return Result.Failed($"Не удалось распознать длительность в строке {line}");
@@ -265,7 +265,7 @@ namespace Potions
 
 		private Result SetName(Potion potion, string line)
 		{
-			potion.Name = line;
+			potion.Name = potion.Name == Potion.DefaultName ? line : potion.Name;
 			return Result.Success;
 		}
 
@@ -279,6 +279,8 @@ namespace Potions
 			{"можжевельник", "плоды можжевельника" },
 			{"папоротник", "соцветия папоротника" },
 			{"плоды можжевельник", "плоды можжевельника" },
+			{"плоды плоды можжевельника", "плоды можжевельника" },
+			{"полнолуние", "свет полной луны" },
 			{"помешивание", "простое помешивание" },
 			{"простое простое заклинание", "простое заклинание" },
 			{"соцветие вербены", "соцветия вербены" },

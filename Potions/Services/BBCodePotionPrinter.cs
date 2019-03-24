@@ -106,7 +106,7 @@ namespace Potions
 
 		private void PrintEffectHeader(StreamWriter sw, string header)
 		{
-			sw.WriteLine(header.Bold().Underlined().Size(5));
+			sw.WriteLine(header.Bold().Underlined().Size(5).Center());
 		}
 
 		private void PrintTimeGroups(StreamWriter sw, IReadOnlyCollection<Potion> potions)
@@ -125,7 +125,7 @@ namespace Potions
 			{
 				return;
 			}
-			sw.WriteLine(header.Bold().Underlined().Size(3));
+			sw.WriteLine(header.Bold().Underlined().Size(3).Center());
 			sw.Write(BBCodeStringExtenstions.SpoilerOpen);
 			foreach(var potion in potions)
 			{
@@ -208,6 +208,35 @@ namespace Potions
 			return result;
 		}
 
+		private string ItemToString(Item item)
+		{
+			if (item.IsAction)
+			{
+				var bold = item.Name.Bold();
+				switch(item.Name)
+				{
+					case "Простое помешивание":
+						return bold.Color("32511f");
+					case "Простое заклинание":
+						return bold.Color("5a2b59");
+					case "Нагревание":
+						return bold.Color("6a3611");
+					case "Свет полной луны":
+						return bold.Color("5487bb");
+					default:
+						return bold;
+				}
+			}
+			else if (item.Rarity != Rarity.Usual)
+			{
+				return item.Name.Italic();
+			}
+			else
+			{
+				return item.Name;
+			}
+		}
+
 		private void Print(StreamWriter sw, IReadOnlyCollection<Recipe> recipes)
 		{
 			switch (recipes.Count)
@@ -217,7 +246,7 @@ namespace Potions
 				case 1:
 					sw.WriteLine("Рецепт".Bold()
 						+ ": "
-						+ String.Join(" + ", recipes.First().Items.Select(i => i.Name)));
+						+ String.Join(" + ", recipes.First().Items.Select(ItemToString)));
 					break;
 				default:
 					var sorted = Sort(recipes);
@@ -225,7 +254,7 @@ namespace Potions
 					sorted.ForEach((r, index) =>
 					{
 						sw.WriteLine($"{index + 1}) "
-							+ String.Join(" + ", r.Items.Select(i => i.Name)));
+							+ String.Join(" + ", r.Items.Select(ItemToString)));
 					});
 					break;
 			}
@@ -243,6 +272,7 @@ namespace Potions
 	public static class BBCodeStringExtenstions
 	{
 		public static string Bold(this string s) => "[b]" + s + "[/b]";
+		public static string Italic(this string s) => "[i]" + s + "[/i]";
 		public static string Underlined(this string s) => "[u]" + s + "[/u]";
 		public static string Center(this string s) => "[c]" + s + "[/c]";
 		public static string Size(this string s, int size) => $"[size={size}]" + s + "[/size]";
