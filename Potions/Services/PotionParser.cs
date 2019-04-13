@@ -265,7 +265,7 @@ namespace Potions
 
 		private Result SetName(Potion potion, string line)
 		{
-			potion.Name = potion.Name == Potion.DefaultName ? line : potion.Name;
+			potion.Name = potion.HasDefaultName ? line : potion.Name;
 			return Result.Success;
 		}
 

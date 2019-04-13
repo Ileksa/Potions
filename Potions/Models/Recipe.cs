@@ -35,5 +35,25 @@ namespace Potions
 
 			return (_items.Count < other._items.Count) ? -1 : 1;
 		}
+
+		public static bool operator==(Recipe r1, Recipe r2)
+		{
+			return r1.CompareTo(r2) == 0;
+		}
+
+		public static bool operator !=(Recipe r1, Recipe r2)
+		{
+			return !(r1 == r2);
+		}
+
+		public override bool Equals(object obj)
+		{
+			return base.Equals(obj);
+		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
 	}
 }

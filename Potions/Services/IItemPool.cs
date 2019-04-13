@@ -1,4 +1,5 @@
 ﻿using Functional.Maybe;
+using System.Collections.Generic;
 
 namespace Potions
 {
@@ -16,5 +17,7 @@ namespace Potions
 		/// Проверяет, является ли переданный элемент зельеварения полнолунием.
 		/// </summary>
 		bool IsFullMoon(Item item);
+
+		IReadOnlyCollection<Item> All(int level, Rarity rarity = Rarity.Usual, bool includeActions = true);
 	}
 }

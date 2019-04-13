@@ -68,15 +68,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Applications\ChainsGeneratorApplication.cs" />
+    <Compile Include="Applications\IApplication.cs" />
     <Compile Include="Applications\RecipesByLevelApplication.cs" />
     <Compile Include="Enums\Duration.cs" />
+    <Compile Include="Extensions\BBCodeStringExtenstions.cs" />
+    <Compile Include="Models\Chain.cs" />
+    <Compile Include="Models\PotionBase.cs" />
+    <Compile Include="Services\BBCodeChainPrinter.cs" />
     <Compile Include="Services\ChainsGenerator.cs" />
     <Compile Include="Services\PotionParser.cs" />
     <Compile Include="Models\Effect.cs" />
     <Compile Include="Models\Recipe.cs" />
     <Compile Include="Models\Result.cs" />
     <Compile Include="Services\BBCodePotionPrinter.cs" />
-    <Compile Include="Services\IIPotionPrinter.cs" />
     <Compile Include="Services\IItemPool.cs" />
     <Compile Include="Services\IPotionValidator.cs" />
     <Compile Include="Services\ItemPool.cs" />

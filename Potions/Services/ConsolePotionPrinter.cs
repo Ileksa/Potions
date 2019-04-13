@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Potions
 {
-	public class ConsolePotionPrinter : IIPotionPrinter
+	public class ConsolePotionPrinter
 	{
 		public void Print(Potion potion)
 		{

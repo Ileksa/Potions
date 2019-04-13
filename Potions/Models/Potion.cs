@@ -1,38 +1,27 @@
-﻿using Functional.Maybe;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Potions
 {
-	public class Potion
+	public class Potion: PotionBase
 	{
-		public int Level { get; set; }
-		public string Name { get; set; }
-		public Effect Effect { get; set; }
-		public Duration Duration { get; set; }
-		public Maybe<int> Price { get; set; }
-
-		public const string DefaultName = "Undefined";
-
 		private List<Recipe> _recipes;
 		public IReadOnlyCollection<Recipe> Recipes { get { return _recipes; } }
 
 		public Potion()
 		{
-			Level = 1;
-			Name = DefaultName;
-			Effect = Effect.Empty;
 			_recipes = new List<Recipe>();
-			Price = Maybe<int>.Nothing;
 		}
 
-		public void Add(Recipe recipe)
+		public Potion Add(Recipe recipe)
 		{
 			_recipes.Add(recipe);
+			return this;
 		}
 
-		public void AddRange(IReadOnlyCollection<Recipe> recipes)
+		public Potion AddRange(IReadOnlyCollection<Recipe> recipes)
 		{
 			_recipes.AddRange(recipes);
+			return this;
 		}
 	}
 }

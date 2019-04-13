@@ -17,10 +17,10 @@ namespace Potions
 		}
 
 		//Схема для всех уровней: И1 И1 А И2 И2 А И3 И3 А И4 И4 А И5 И5 А Сезонный/Редкий
-		public IReadOnlyCollection<Potion> TenUsualOneSeasonalOrRarePatternOne(IReadOnlyCollection<Potion> alreadyExists)
+		public IReadOnlyCollection<Chain> TenUsualOneSeasonalOrRarePatternOne(IReadOnlyCollection<Potion> alreadyExists)
 		{
 			var perms = Permutations(5);
-			var potions = new List<Potion>(perms.Count * 5 * 3);
+			var chains = new List<Chain>(perms.Count * 5 * 3);
 			for (int level = 1; level <= 3; level++)
 			{
 				var all = _itemPool.All(level, includeActions: true);
@@ -40,23 +40,52 @@ namespace Potions
 					}
 
 					var withoutRareRecipe = new Recipe(new List<Item>(recipeItems));
-					var withoutRarePotion = new Potion() { Level = level };
-					withoutRarePotion.Add(withoutRareRecipe);
-					potions.Add(withoutRarePotion);
+					var withoutRareChain = new Chain(withoutRareRecipe) { Level = level };
+					chains.Add(withoutRareChain);
 
 					foreach(var rareItem in seasonalAndRare)
 					{
 						var recipe = new Recipe(recipeItems.Append(rareItem).ToList());
-						var potion = new Potion() { Level = level };
-						potion.Add(recipe);
-						potions.Add(potion);
+						var chain = new Chain(recipe) { Level = level };
+						chains.Add(chain);
 					}
 				}
 
 			}
-			return potions;
+			return ApplyExistentPotions(chains, alreadyExists);
 		}
 
+		private IReadOnlyCollection<Chain> ApplyExistentPotions(
+			IReadOnlyCollection<Chain> chains, IReadOnlyCollection<Potion> alreadyExist)
+		{
+			foreach(var chain in chains)
+			{
+				var found = false;
+				foreach(var potion in alreadyExist)
+				{
+					foreach(var recipe in potion.Recipes)
+					{
+						if (chain.Recipe == recipe)
+						{
+							chain.Name = potion.Name;
+							chain.Effect = potion.Effect;
+							chain.Duration = potion.Duration;
+							chain.Price = potion.Price;
+							found = true;
+							break;
+						}
+					}
+
+					if (found)
+					{
+						break;
+					}
+				}
+			}
+			return chains;
+		}
+
+		//все перестановки от 0 до n, не включая n
 		private List<List<int>> Permutations(int n)
 		{
 			Contract.Requires(n < 13);

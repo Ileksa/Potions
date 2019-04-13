@@ -41,40 +41,50 @@ namespace Potions
 			return item.Equals(_fullMoon);
 		}
 
+		public IReadOnlyCollection<Item> All(int level, Rarity rarity = Rarity.Usual, bool includeActions = true)
+		{
+			return _items
+				.Values
+				.Where(i => !IsFullMoon(i)
+					&& i.Level == level
+					&& i.Rarity == rarity
+					&& (includeActions ? true : !i.IsAction))
+				.ToList();
+		}
 
-		private readonly Item _fullMoon = new Item(2, "Свет полной луны", true);
+		private readonly Item _fullMoon = new Item(2, "Свет полной луны", true, shortName: "Луна");
 		private readonly List<Item> _actions = new List<Item>()
 		{
-			new Item(1, "Простое помешивание", true),
-			new Item(2, "Простое заклинание", true),
-			new Item(3, "Нагревание", true)
+			new Item(1, "Простое помешивание", true, shortName: "Помш"),
+			new Item(2, "Простое заклинание", true, shortName: "Закл"),
+			new Item(3, "Нагревание", true, shortName: "Нагр")
 		};
 
 		private readonly List<Item> _firstLevelIngrs = new List<Item>()
 		{
-			new Item(1, "Аконит"),
-			new Item(1, "Воронец колосистый"),
-			new Item(1, "Соцветия вербены"),
-			new Item(1, "Соцветия папоротника"),
-			new Item(1, "Сушеные гусеницы")
+			new Item(1, "Аконит", shortName: "Акнт"),
+			new Item(1, "Воронец колосистый", shortName: "Врнц"),
+			new Item(1, "Соцветия вербены", shortName: "Верб"),
+			new Item(1, "Соцветия папоротника", shortName: "Папр"),
+			new Item(1, "Сушеные гусеницы", shortName: "Гусц")
 		};
 
 		private readonly List<Item> _secondLevelIngrs = new List<Item>()
 		{
-			new Item(2, "Мята"),
-			new Item(2, "Плоды можжевельника"),
-			new Item(2, "Сушеные жуки"),
-			new Item(2, "Цветок лаванды"),
-			new Item(2, "Чеснок")
+			new Item(2, "Мята", shortName: "Мята"),
+			new Item(2, "Плоды можжевельника", shortName: "Мжвл"),
+			new Item(2, "Сушеные жуки", shortName: "Жуки"),
+			new Item(2, "Цветок лаванды", shortName: "Лвнд"),
+			new Item(2, "Чеснок", shortName: "Чснк")
 		};
 
 		private readonly List<Item> _thirdLevelIngrs = new List<Item>()
 		{
-			new Item(3, "Белладонна"),
-			new Item(3, "Глаз змеи"),
-			new Item(3, "Капля родниковой воды"),
-			new Item(3, "Мимбулус Мимблетония"),
-			new Item(3, "Молодая еловая шишка")
+			new Item(3, "Белладонна", shortName: "Блдн"),
+			new Item(3, "Глаз змеи", shortName: "Глзм"),
+			new Item(3, "Капля родниковой воды", shortName: "Капл"),
+			new Item(3, "Мимбулус Мимблетония", shortName: "Ммбл"),
+			new Item(3, "Молодая еловая шишка", shortName: "Шишк")
 		};
 
 		private readonly List<Item> _firstLevelSeasonIngrs = new List<Item>()

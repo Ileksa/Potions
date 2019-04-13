@@ -6,7 +6,8 @@ namespace Potions
 	{
 		static void Main(string[] args)
 		{
-			new RecipesByLevelApplication().Run();
+			//new RecipesByLevelApplication().Run();
+			new ChainsGeneratorApplication().Run();
 		}
 	}
 }

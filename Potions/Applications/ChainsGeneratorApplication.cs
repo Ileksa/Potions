@@ -5,29 +5,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Potions.Applications
+namespace Potions
 {
-	public class RecipesByLevelApplication: IApplication
+	public class ChainsGeneratorApplication: IApplication
 	{
+		private readonly ChainsGenerator _chainsGenerator;
 		private readonly IItemPool _itemPool;
 		private readonly IPotionValidator _potionValidator;
 		private readonly PotionParser _potionParser;
-		private readonly BBCodePotionPrinter _potionPrinter;
+		private readonly BBCodeChainPrinter _potionPrinter;
 
-		public RecipesByLevelApplication()
+		//не ок реализация, поправить, когда будет инъекция
+		public ChainsGeneratorApplication()
 		{
-			//впилить ninject и вообще по уму сделать
 			_itemPool = new ItemPool();
 			_potionValidator = new PotionValidator();
 			_potionParser = new PotionParser(_itemPool, _potionValidator);
-			_potionPrinter = new BBCodePotionPrinter("result.txt");
+			_chainsGenerator = new ChainsGenerator(_itemPool);
+			_potionPrinter = new BBCodeChainPrinter("result.txt");
 		}
 
 		public void Run()
 		{
 			while (true)
 			{
-				Console.WriteLine("Введите путь к файлу. Чтобы выйти, введите пустую строку.");
+				Console.WriteLine("Введите путь к файлу с существующими зельями. Чтобы выйти, введите пустую строку.");
 				var path = Console.ReadLine();
 				if (path == String.Empty)
 				{
@@ -50,7 +52,8 @@ namespace Potions.Applications
 						.Select(r => r.Item2)
 						.ToArray();
 
-					_potionPrinter.Print(successPotions);
+					var chains = _chainsGenerator.TenUsualOneSeasonalOrRarePatternOne(successPotions);
+					_potionPrinter.Print(chains);
 
 					foreach (var error in errors)
 					{
